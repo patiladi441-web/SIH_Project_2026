@@ -1,0 +1,94 @@
+
+
+@layer base {
+  * {
+    border-color: rgba(94, 234, 212, 0.12);
+  }
+
+  body {
+    background-color: #061A24;
+    color: #E8F7F5;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+@import "tailwindcss";
+
+@theme {
+  /* Brand & Status Colors */
+  --color-deep: #061A24;
+  --color-midnight: #092B36;
+  --color-elevated: #0D3440;
+  --color-brand: #0FAF9A;
+  --color-seafoam: #5EEAD4;
+  --color-ice: #E8F7F5;
+  --color-muted-ice: #91AFB3;
+  --color-satellite: #38BDF8;
+  --color-argo: #F59E0B;
+  --color-ai: #14B8A6;
+  --color-warning: #F97316;
+  --color-danger: #EF4444;
+
+  /* Specific Border Colors */
+  --color-ocean: rgba(94, 234, 212, 0.12);
+  --color-ocean-bright: rgba(94, 234, 212, 0.35);
+
+  /* Typography */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Custom Glowing Shadows */
+  --shadow-glow: 0 0 20px rgba(15, 175, 154, 0.25);
+  --shadow-glow-lg: 0 0 40px rgba(15, 175, 154, 0.35);
+  --shadow-radar: 0 0 50px rgba(56, 189, 248, 0.15);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-ocean);
+  }
+
+  body {
+    background-color: var(--color-deep);
+    color: var(--color-ice);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Bathymetry & Radar Grid Texture */
+.ocean-grid {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(15, 175, 154, 0.05) 0%, transparent 80%),
+    linear-gradient(to right, rgba(94, 234, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(94, 234, 212, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+}
+
+/* Leaflet Dark Theme Overrides */
+.leaflet-container {
+  background-color: #04121A !important;
+  font-family: var(--font-mono) !important;
+}
+
+.leaflet-tile {
+  filter: brightness(0.65) invert(1) contrast(3) hue-rotate(180deg) saturate(0.35);
+}
+
+/* Modern Minimal Dark Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-elevated);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand);
+}
