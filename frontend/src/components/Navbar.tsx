@@ -16,13 +16,13 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="h-14 w-full border-b border-ocean bg-deep/90 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-50">
+    <header className="h-16 w-full border-b border-ocean bg-deep/90 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-50">
       <div className="flex items-center gap-4">
         <button
           onClick={() => dispatch(setView('landing'))}
           className="flex items-center gap-2 text-left group cursor-pointer"
         >
-          <div className="w-7 h-7 rounded-md bg-brand/10 border border-brand/30 flex items-center justify-center text-brand group-hover:border-seafoam transition-colors">
+          <div className="w-8 h-8 rounded-md bg-brand/10 border border-brand/30 flex items-center justify-center text-brand group-hover:border-seafoam transition-colors">
             <Waves className="w-4 h-4 text-brand" />
           </div>
           <div>
@@ -67,7 +67,7 @@ export const Navbar: React.FC = () => {
       </nav>
 
       <div className="flex items-center gap-3">
-        <div className="hidden md:flex items-center gap-2 font-mono text-[11px] text-muted-ice">
+        <div className="hidden md:flex items-center gap-2 font-mono text-[11px] text-muted-ice ml-3">
           <span className="w-2 h-2 rounded-full bg-brand" />
           <span>LAS ARGO MATCHUP LIVE</span>
         </div>

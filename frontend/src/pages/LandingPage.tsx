@@ -46,27 +46,26 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div ref={heroRef} className="relative min-h-[calc(100vh-3.5rem)] flex flex-col justify-between overflow-hidden ocean-grid">
+    <div ref={heroRef} className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-between overflow-hidden ocean-grid bg-deep">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-brand/10 rounded-full blur-[140px]" />
         <div className="absolute bottom-10 right-10 w-[500px] h-[300px] bg-satellite/10 rounded-full blur-[120px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-16 pb-12 w-full flex-1 flex flex-col justify-center relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-[1400px] mx-auto px-6 pt-12 pb-12 w-full flex-1 flex flex-col justify-center relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
           {/* Left Earth Image */}
-          <div className="flex justify-center items-center relative animate-pulse-slow">
-             <div className="absolute inset-0 bg-brand/20 blur-[100px] rounded-full"></div>
+          <div className="flex justify-center items-center w-full">
              <img 
-               src="https://upload.wikimedia.org/wikipedia/commons/2/23/Blue_Marble_2002.png" 
+               src="/earth.png" 
                alt="Earth" 
-               className="w-full max-w-[400px] md:max-w-[500px] object-contain drop-shadow-[0_0_40px_rgba(15,175,154,0.5)] rounded-full border border-ocean/30"
+               className="w-full max-w-[650px] lg:max-w-[720px] object-contain rounded-2xl"
              />
           </div>
 
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-midnight/90 border border-ocean text-seafoam font-mono text-xs mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-midnight border border-ocean text-brand-light font-mono text-xs mb-6 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-brand" />
               <span>SATELLITE INTELLIGENCE FOR A DEEPER TOMORROW</span>
             </div>
@@ -76,7 +75,7 @@ export const LandingPage: React.FC = () => {
               className="font-display font-bold text-5xl md:text-7xl tracking-tight text-ice leading-[1.05] uppercase"
             >
               SEE BELOW <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-seafoam via-brand to-satellite">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-light via-brand to-satellite">
                 THE SURFACE.
               </span>
             </h1>
@@ -93,7 +92,7 @@ export const LandingPage: React.FC = () => {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <button
                 onClick={() => dispatch(setView('explorer'))}
-                className="flex items-center gap-2.5 px-6 py-3.5 rounded-lg bg-brand hover:bg-brand/90 text-deep font-display font-semibold text-sm tracking-wide shadow-glow transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-lg bg-brand hover:bg-brand-glow text-ice font-display font-semibold text-sm tracking-wide shadow-glow transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
               >
                 <Compass className="w-4 h-4" />
                 <span>Explore the Ocean</span>
@@ -102,7 +101,7 @@ export const LandingPage: React.FC = () => {
 
               <button
                 onClick={() => dispatch(setView('about'))}
-                className="flex items-center gap-2 px-5 py-3.5 rounded-lg bg-midnight/90 hover:bg-elevated text-ice font-mono text-xs border border-ocean hover:border-ocean-bright transition-all cursor-pointer"
+                className="flex items-center gap-2 px-5 py-3.5 rounded-lg bg-midnight/90 hover:bg-elevated text-ice font-mono text-xs border border-ocean hover:border-brand-light/50 transition-all cursor-pointer"
               >
                 <span>Methodology & Architecture</span>
                 <ExternalLink className="w-3.5 h-3.5 text-muted-ice" />
@@ -113,28 +112,28 @@ export const LandingPage: React.FC = () => {
 
         <div
           ref={statsRef}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 pt-8 border-t border-ocean/80"
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 pt-10 border-t border-ocean"
         >
-          <div className="p-4 rounded-xl bg-midnight/60 border border-ocean backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-1">
+          <div className="p-5 rounded-2xl bg-midnight/80 border border-ocean backdrop-blur-md shadow-lg transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-2">
               <Layers className="w-4 h-4 text-satellite" />
               <span>INPUT DATASETS</span>
             </div>
             <div className="text-2xl font-display font-bold text-ice">4+ Sources</div>
-            <div className="text-[11px] font-mono text-muted-ice/70 mt-1">SST · SSH · SSS · ASCAT</div>
+            <div className="text-[11px] font-mono text-muted-ice/70 mt-1">SST • SSH • SSS • ASCAT</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-midnight/60 border border-ocean backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-1">
+          <div className="p-5 rounded-2xl bg-midnight/80 border border-ocean backdrop-blur-md shadow-lg transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-2">
               <Compass className="w-4 h-4 text-brand" />
               <span>VERTICAL REACH</span>
             </div>
-            <div className="text-2xl font-display font-bold text-seafoam">0 — 1000 m</div>
+            <div className="text-2xl font-display font-bold text-brand-light">0 - 1000 m</div>
             <div className="text-[11px] font-mono text-muted-ice/70 mt-1">15 standard levels</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-midnight/60 border border-ocean backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-1">
+          <div className="p-5 rounded-2xl bg-midnight/80 border border-ocean backdrop-blur-md shadow-lg transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-2">
               <Database className="w-4 h-4 text-argo" />
               <span>RESOLUTION</span>
             </div>
@@ -142,8 +141,8 @@ export const LandingPage: React.FC = () => {
             <div className="text-[11px] font-mono text-muted-ice/70 mt-1">GLORYS12V1 aligned</div>
           </div>
 
-          <div className="p-4 rounded-xl bg-midnight/60 border border-ocean backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-1">
+          <div className="p-5 rounded-2xl bg-midnight/80 border border-ocean backdrop-blur-md shadow-lg transition-transform hover:-translate-y-1">
+            <div className="flex items-center gap-2 text-muted-ice text-xs font-mono mb-2">
               <Sparkles className="w-4 h-4 text-ai" />
               <span>VALIDATION</span>
             </div>
@@ -153,11 +152,11 @@ export const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="border-t border-ocean bg-midnight/40 px-6 py-3 flex flex-wrap items-center justify-between text-xs font-mono text-muted-ice">
-        <div>Problem Statement ID: 26066 · Ministry of Earth Sciences (MoES) / INCOIS</div>
-        <div className="flex gap-4">
-          <span>Lat: 5°N–30°N</span>
-          <span>Lon: 45°E–105°E</span>
+      <div className="border-t border-ocean bg-midnight/50 px-6 py-4 flex flex-wrap items-center justify-between text-xs font-mono text-muted-ice z-20 relative">
+        <div>Problem Statement ID: 26066 • Ministry of Earth Sciences (MoES) / INCOIS</div>
+        <div className="flex gap-6">
+          <span>Lat: 5°N - 30°N</span>
+          <span>Lon: 45°E - 105°E</span>
         </div>
       </div>
     </div>

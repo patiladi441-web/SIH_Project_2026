@@ -33,9 +33,9 @@ export const Explorer: React.FC = () => {
     useSelector((state: RootState) => state.explorer);
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col w-full bg-deep">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col w-full bg-deep">
       {/* Top Utility Bar */}
-      <div className="h-10 border-b border-ocean bg-midnight/50 flex items-center justify-between px-4 text-xs font-mono text-muted-ice shrink-0">
+      <div className="h-10 border-b border-ocean bg-midnight/50 flex items-center justify-between px-6 text-xs font-mono text-muted-ice shrink-0">
         <div className="flex gap-4">
           <span className="flex items-center gap-1.5 text-brand"><div className="w-1.5 h-1.5 bg-brand rounded-full animate-pulse" /> INFERENCE ENGINE: ONLINE</span>
           <span className="opacity-50">|</span>
@@ -47,9 +47,9 @@ export const Explorer: React.FC = () => {
       </div>
 
       {/* Main Workbench Body */}
-      <div className="flex-1 flex flex-col lg:flex-row p-4 gap-4 bg-deep/50 items-stretch overflow-y-auto">
+      <div className="flex-1 flex flex-col lg:flex-row p-6 gap-6 bg-deep/50 items-stretch overflow-y-auto">
         {/* Left Vertical Nav */}
-        <nav className="hidden lg:flex w-16 rounded-xl border border-ocean bg-midnight/80 flex-col items-center py-5 gap-5 z-20 shadow-lg shrink-0">
+        <nav className="hidden lg:flex w-16 rounded-xl border border-ocean bg-midnight/80 flex-col items-center py-5 gap-5 z-20 shadow-lg shrink-0 animate-fade-in">
           <button className="p-3 rounded-xl bg-brand/10 text-brand border border-brand/20 shadow-glow">
             <Compass className="w-5 h-5" />
           </button>
@@ -62,7 +62,7 @@ export const Explorer: React.FC = () => {
         </nav>
 
         {/* Central Content Area */}
-        <div className="flex-1 flex flex-col gap-4 rounded-xl min-w-0">
+        <div className="flex-1 flex flex-col gap-6 rounded-xl min-w-0 animate-slide-up" style={{ animationDelay: '0.1s' }}>
           
           {/* Map Viewport Area */}
           <div className="relative bg-[#04121A] rounded-xl overflow-hidden border border-ocean shadow-xl min-h-[350px] lg:flex-1 shrink-0">
@@ -198,7 +198,7 @@ export const Explorer: React.FC = () => {
        </div>
 
        {/* Right Query Panel */}
-       <div className="w-full lg:w-80 border border-ocean bg-midnight/90 rounded-xl p-5 flex flex-col justify-between z-20 shadow-xl shrink-0">
+       <div className="w-full lg:w-80 border border-ocean bg-midnight/90 rounded-xl p-6 flex flex-col justify-between z-20 shadow-xl shrink-0 animate-slide-up" style={{ animationDelay: '0.2s' }}>
          <div className="space-y-6">
            <div>
              <span className="text-xs font-mono text-brand uppercase tracking-wider font-semibold">Analysis Mode</span>

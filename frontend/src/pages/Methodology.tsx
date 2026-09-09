@@ -3,7 +3,7 @@ import { Network, Satellite, Layers, Waves, ArrowRight, Cpu, ArrowDown } from 'l
 
 export const Methodology: React.FC = () => {
   return (
-    <div className="h-[calc(100vh-3.5rem)] w-full bg-deep text-ice overflow-y-auto font-sans p-8">
+    <div className="h-[calc(100vh-4rem)] w-full bg-deep text-ice overflow-y-auto font-sans p-8">
       <div className="max-w-6xl mx-auto space-y-12">
         
         {/* Header Section */}
