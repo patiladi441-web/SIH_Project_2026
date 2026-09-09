@@ -1,0 +1,36 @@
+# Environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Data & Logs
+*.log
+data/raw/
+data/processed/
+*.nc
+
+# OS files
+.DS_Store
+Thumbs.db
