@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
 // Custom glowing crosshair marker
@@ -15,6 +15,16 @@ const crosshairIcon = new L.DivIcon({
   `,
   iconSize: [32, 32],
 });
+
+// Helper component to listen to clicks on the map
+const MapClickHandler: React.FC<{ onClick: (lat: number, lon: number) => void }> = ({ onClick }) => {
+  useMapEvents({
+    click(e) {
+      onClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+};
 
 // Helper component to smoothly pan the map when coordinates change
 const MapUpdater: React.FC<{ center: [number, number] }> = ({ center }) => {
@@ -61,6 +71,7 @@ export const OceanMap: React.FC<OceanMapProps> = ({ lat, lon, onLocationSelect }
             },
           }}
         />
+        <MapClickHandler onClick={onLocationSelect} />
         <MapUpdater center={[lat, lon]} />
       </MapContainer>
     </div>

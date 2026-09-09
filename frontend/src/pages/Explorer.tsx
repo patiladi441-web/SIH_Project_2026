@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../app/store';
-import { runReconstruction, setLocation } from '../features/explorerSlice';
+import { runReconstruction, setLocation, setDate } from '../features/explorerSlice';
 import { OceanMap } from '../components/OceanMap';
 import { SubsurfaceProfileChart } from '../components/SubsurfaceProfileChart';
 import { TransectChart } from '../components/TransectChart';
@@ -28,305 +28,261 @@ const STEPS = [
 export const Explorer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [viewMode, setViewMode] = useState<'point' | 'transect'>('point');
-  
+
   const { selectedLocation, selectedDate, isInferring, inferenceStep, results } =
     useSelector((state: RootState) => state.explorer);
 
-  const predefinedZones = [
-    { name: 'Arabian Sea (Central)', lat: 18.4521, lon: 72.8314 },
-    { name: 'Bay of Bengal (Depression)', lat: 15.2144, lon: 88.3412 },
-    { name: 'Equatorial Ocean', lat: 5.5122, lon: 78.4123 },
-  ];
-
   return (
-    <div className="h-[calc(100vh-3.5rem)] w-full bg-deep text-ice flex flex-col overflow-hidden font-sans">
-      {/* Inference Progress Modal */}
-      {isInferring && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-deep/80 backdrop-blur-sm">
-          <div className="w-[460px] bg-midnight border border-ocean rounded-xl p-6 shadow-2xl">
-            <div className="flex items-center gap-3 pb-4 mb-4 border-b border-ocean">
-              <Compass className="w-5 h-5 text-brand animate-pulse" />
-              <span className="font-display font-semibold text-ice tracking-wider">
-                OCEANEMBED INFERENCE PIPELINE
-              </span>
-            </div>
-            <div className="space-y-4">
-              {STEPS.map((label, idx) => {
-                const stepNum = idx + 1;
-                const isDone = inferenceStep > stepNum;
-                const isCurrent = inferenceStep === stepNum;
-                return (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      {isDone ? (
-                        <CheckCircle2 className="w-4 h-4 text-brand" />
-                      ) : isCurrent ? (
-                        <Loader2 className="w-4 h-4 text-satellite animate-spin" />
-                      ) : (
-                        <div className="w-4 h-4 rounded-full border border-muted-ice/30" />
-                      )}
-                    </div>
-                    <div>
-                      <div
-                        className={`text-xs font-mono ${
-                          isCurrent
-                            ? 'text-ice font-semibold'
-                            : isDone
-                            ? 'text-brand'
-                            : 'text-muted-ice/50'
-                        }`}
-                      >
-                        STEP 0{stepNum}
-                      </div>
-                      <div className={`text-xs ${isCurrent ? 'text-ice' : 'text-muted-ice'}`}>
-                        {label}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+    <div className="min-h-[calc(100vh-3.5rem)] flex flex-col w-full bg-deep">
+      {/* Top Utility Bar */}
+      <div className="h-10 border-b border-ocean bg-midnight/50 flex items-center justify-between px-4 text-xs font-mono text-muted-ice shrink-0">
+        <div className="flex gap-4">
+          <span className="flex items-center gap-1.5 text-brand"><div className="w-1.5 h-1.5 bg-brand rounded-full animate-pulse" /> INFERENCE ENGINE: ONLINE</span>
+          <span className="opacity-50">|</span>
+          <span>GPU: A100-PCIE-40GB</span>
         </div>
-      )}
+        <div>
+          LAT: {selectedLocation.lat.toFixed(4)}°N • LON: {selectedLocation.lon.toFixed(4)}°E
+        </div>
+      </div>
 
       {/* Main Workbench Body */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row p-4 gap-4 bg-deep/50 items-stretch overflow-y-auto">
         {/* Left Vertical Nav */}
-        <nav className="w-14 border-r border-ocean bg-midnight flex flex-col items-center py-5 gap-5 z-20">
-          <button className="p-2 rounded-lg bg-brand/10 text-brand border border-brand/20">
-            <Compass className="w-4 h-4" />
+        <nav className="hidden lg:flex w-16 rounded-xl border border-ocean bg-midnight/80 flex-col items-center py-5 gap-5 z-20 shadow-lg shrink-0">
+          <button className="p-3 rounded-xl bg-brand/10 text-brand border border-brand/20 shadow-glow">
+            <Compass className="w-5 h-5" />
           </button>
-          <button className="p-2 rounded-lg text-muted-ice hover:text-ice hover:bg-elevated transition-colors">
-            <Layers className="w-4 h-4" />
+          <button className="p-3 rounded-xl text-muted-ice hover:text-ice hover:bg-elevated transition-colors">
+            <Layers className="w-5 h-5" />
           </button>
-          <button className="p-2 rounded-lg text-muted-ice hover:text-ice hover:bg-elevated transition-colors">
-            <Database className="w-4 h-4" />
+          <button className="p-3 rounded-xl text-muted-ice hover:text-ice hover:bg-elevated transition-colors">
+            <Database className="w-5 h-5" />
           </button>
         </nav>
 
-        {/* Center Canvas + Bottom Results */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Central Content Area */}
+        <div className="flex-1 flex flex-col gap-4 rounded-xl min-w-0">
           
           {/* Map Viewport Area */}
-          <div className="flex-1 relative bg-[#04121A] overflow-hidden">
+          <div className="relative bg-[#04121A] rounded-xl overflow-hidden border border-ocean shadow-xl min-h-[350px] lg:flex-1 shrink-0">
             <div className="absolute inset-0 bg-[radial-gradient(#0FAF9A_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none z-10" />
-
-            {/* Quick Presets */}
-            <div className="absolute top-4 left-4 z-20 flex gap-2">
-              {predefinedZones.map((zone) => (
-                <button
-                  key={zone.name}
-                  onClick={() => dispatch(setLocation({ lat: zone.lat, lon: zone.lon, name: zone.name }))}
-                  className="text-xs font-mono px-3 py-1.5 rounded-md bg-midnight/90 border border-ocean text-muted-ice hover:text-ice hover:border-brand/40 transition-all backdrop-blur cursor-pointer shadow-md"
-                >
-                  {zone.name}
-                </button>
-              ))}
-            </div>
-
-            {/* LEAFLET MAP INTEGRATION */}
-            <OceanMap 
-              lat={selectedLocation.lat} 
-              lon={selectedLocation.lon}
-              onLocationSelect={(lat, lon) => dispatch(setLocation({ lat, lon, name: 'Custom Selection' }))}
-            />
-
-            <div className="absolute bottom-3 left-4 z-20 text-[11px] font-mono text-muted-ice/80 bg-deep/60 px-2 py-1 rounded backdrop-blur border border-ocean">
-              {viewMode === 'point' 
-                ? 'Drag crosshair or select presets to update coordinates (5°N–30°N)' 
-                : 'Transect Mode Active: Analyzing 100km horizontal cross-section from origin point'}
-            </div>
-          </div>
-
-          {/* Bottom Results Drawer */}
-          <div className="h-72 border-t border-ocean bg-midnight p-4 flex gap-6 z-20">
-            <div className="flex-1 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-display font-medium text-sm text-ice uppercase tracking-wider">
-                    {viewMode === 'point' ? 'Vertical Subsurface Thermal Profile' : 'Horizontal Cross-Section Analysis'}
-                  </h3>
-                  <p className="text-xs text-muted-ice font-mono">
-                    {viewMode === 'point' ? 'Reconstruction vs In-Situ Real ARGO Verification' : 'Simulated Deep Learning Spatial Transect'}
-                  </p>
-                </div>
-                {results && viewMode === 'point' && (
-                  <div className="flex gap-3 font-mono text-xs">
-                    <div className="bg-elevated px-3 py-1 rounded border border-ocean">
-                      <span className="text-muted-ice">RMSE: </span>
-                      <span className="text-brand font-bold">{results.metrics.rmse}°C</span>
-                    </div>
-                    <div className="bg-elevated px-3 py-1 rounded border border-ocean">
-                      <span className="text-muted-ice">CORRELATION: </span>
-                      <span className="text-brand font-bold">{results.metrics.correlation}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Enhanced Chart Visualizer with 500m Metric & View Toggle */}
-              {results ? (
-                <div className="flex-1 min-h-0 mt-2 flex flex-col">
-                   {viewMode === 'point' ? (
-                     <>
-                       <div className="mb-2 bg-elevated/40 rounded-lg border border-ocean p-2 flex items-center justify-around font-mono text-[11px]">
-                         <div className="space-y-0.5">
-                           <span className="text-brand font-bold">Surface: {results.temperature_c[0]}°C</span>
-                           <div className="text-muted-ice">Depth 0m</div>
-                         </div>
-                         <div className="space-y-0.5">
-                           <span className="text-seafoam font-bold">Thermocline: {results.temperature_c[7]}°C</span>
-                           <div className="text-muted-ice">Depth 100m</div>
-                         </div>
-                         <div className="space-y-0.5">
-                           <span className="text-warning font-bold">Mesopelagic: {results.temperature_c[12]}°C</span>
-                           <div className="text-muted-ice">Depth 500m</div>
-                         </div>
-                       </div>
-                       <div className="flex-1">
-                         <SubsurfaceProfileChart data={results} />
-                       </div>
-                     </>
-                   ) : (
-                     <div className="flex-1 mt-1">
-                       <TransectChart />
-                     </div>
-                   )}
-                </div>
-              ) : (
-                <div className="flex-1 my-2 border border-dashed border-ocean rounded-lg flex items-center justify-center flex-col text-muted-ice text-xs font-mono">
-                  <Crosshair className="w-5 h-5 mb-1.5 opacity-40 text-brand" />
-                  Select geographic coordinates and click "RUN RECONSTRUCTION" to infer field.
-                </div>
-              )}
-
-              <div className="flex items-center justify-between text-[11px] font-mono text-muted-ice border-t border-ocean pt-1.5">
-                <span>MODEL: OceanEmbed-ViT-v1.0</span>
-                <span className="text-brand">{viewMode === 'point' ? 'Depths: 0m to 1000m' : 'Length: 100km'}</span>
+            
+            {/* Overlay UI */}
+            <div className="absolute top-6 left-6 z-20 flex flex-col gap-2">
+              <div className="px-4 py-2 bg-midnight/90 backdrop-blur-md rounded-lg border border-ocean shadow-md font-mono text-xs flex flex-col gap-1 text-muted-ice">
+                <span className="text-ice font-display text-sm tracking-wider uppercase mb-1">
+                  {selectedLocation.name || 'Custom Coordinate'}
+                </span>
+                <span className="flex items-center gap-2"><div className="w-2 h-2 bg-satellite rounded-full animate-pulse" /> SATELLITE: Online</span>
+                <span className="flex items-center gap-2"><div className="w-2 h-2 bg-argo rounded-full" /> ARGO MATCHUP: Active</span>
               </div>
             </div>
 
-            {/* Float Comparison Card */}
-            {results && viewMode === 'point' && (
-              <div className="w-72 border-l border-ocean pl-5 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-mono uppercase text-argo font-semibold">
-                    In-Situ Verification
-                  </span>
-                  <h4 className="text-xs font-display font-medium text-ice mt-0.5 truncate">
-                    {results.nearest_argo.float_id}
-                  </h4>
-                  <p className="text-[11px] text-muted-ice mt-0.5">
-                    Match distance: <strong className="text-ice">{results.nearest_argo.distance_km} km</strong>
-                  </p>
-                </div>
-
-                <div className="space-y-1.5 font-mono text-[11px]">
-                  <div className="p-1.5 rounded bg-elevated border border-ocean flex justify-between">
-                    <span className="text-muted-ice">Mean Bias</span>
-                    <span className="text-ice">+{results.metrics.mean_bias}°C</span>
+            <div className="absolute inset-0 z-0">
+              <OceanMap lat={selectedLocation.lat} lon={selectedLocation.lon} onLocationSelect={(lat, lon) => dispatch(setLocation({ lat, lon }))} />
+            </div>
+            
+            {/* Inference Loader Overlay */}
+            {isInferring && (
+              <div className="fixed inset-0 z-[100] bg-deep/80 backdrop-blur-md flex items-center justify-center">
+                <div className="max-w-md w-full bg-midnight border border-brand/40 p-8 rounded-2xl shadow-[0_0_50px_rgba(15,175,154,0.15)] text-center transform scale-105 transition-transform">
+                  <Loader2 className="w-12 h-12 text-brand animate-spin mx-auto mb-6" />
+                  <h3 className="font-display font-semibold text-ice text-lg mb-4">INFERRING SUBSURFACE PROFILE</h3>
+                  <div className="space-y-4 text-left font-mono text-xs">
+                    {STEPS.map((step, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`flex items-start gap-3 transition-opacity duration-300 ${
+                          inferenceStep > idx ? 'text-seafoam' : inferenceStep === idx ? 'text-ice animate-pulse' : 'text-muted-ice/40'
+                        }`}
+                      >
+                        <div className="mt-0.5">
+                          {inferenceStep > idx ? <CheckCircle2 className="w-4 h-4 text-brand" /> : <div className="w-4 h-4 border border-current rounded-full" />}
+                        </div>
+                        <span className="leading-relaxed">{step}</span>
+                      </div>
+                    ))}
                   </div>
-                  <div className="p-1.5 rounded bg-elevated border border-ocean flex justify-between">
-                    <span className="text-muted-ice">Confidence</span>
-                    <span className="text-brand">94.2%</span>
-                  </div>
                 </div>
-
-                <button className="w-full py-1.5 bg-elevated hover:bg-ocean/20 text-xs font-mono text-seafoam border border-ocean rounded flex items-center justify-center gap-1 cursor-pointer">
-                  Export LAS Matchup <ArrowUpRight className="w-3 h-3" />
-                </button>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Right Query Panel */}
-        <div className="w-72 border-l border-ocean bg-midnight p-4 flex flex-col justify-between z-20">
-          <div className="space-y-5">
-            <div>
-              <span className="text-xs font-mono text-brand uppercase tracking-wider">Analysis Mode</span>
-              <div className="flex bg-elevated rounded-lg p-1 mt-2 border border-ocean">
-                <button 
-                  onClick={() => setViewMode('point')}
-                  className={`flex-1 py-1.5 text-xs font-mono rounded-md flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${viewMode === 'point' ? 'bg-midnight text-ice shadow-sm border border-ocean' : 'text-muted-ice hover:text-ice'}`}
-                >
-                  <Crosshair className="w-3.5 h-3.5" /> Point
-                </button>
-                <button 
-                  onClick={() => setViewMode('transect')}
-                  className={`flex-1 py-1.5 text-xs font-mono rounded-md flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${viewMode === 'transect' ? 'bg-midnight text-ice shadow-sm border border-ocean' : 'text-muted-ice hover:text-ice'}`}
-                >
-                  <Activity className="w-3.5 h-3.5" /> Transect
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-display font-medium text-ice text-sm">Query Station</h3>
-              <div className="space-y-3 font-mono text-xs mt-3">
-                <div>
-                  <label className="text-muted-ice block mb-1">LATITUDE (°N)</label>
-                  <input
-                    type="number"
-                    value={selectedLocation.lat}
-                    onChange={(e) =>
-                      dispatch(setLocation({ ...selectedLocation, lat: parseFloat(e.target.value) || 0 }))
-                    }
-                    className="w-full bg-elevated border border-ocean rounded px-2.5 py-1.5 text-ice focus:border-brand outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-muted-ice block mb-1">LONGITUDE (°E)</label>
-                  <input
-                    type="number"
-                    value={selectedLocation.lon}
-                    onChange={(e) =>
-                      dispatch(setLocation({ ...selectedLocation, lon: parseFloat(e.target.value) || 0 }))
-                    }
-                    className="w-full bg-elevated border border-ocean rounded px-2.5 py-1.5 text-ice focus:border-brand outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-muted-ice block mb-1 flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> TEMPORAL SLICE
-                  </label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    className="w-full bg-elevated border border-ocean rounded px-2.5 py-1.5 text-ice focus:border-brand outline-none"
-                    readOnly
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <span className="text-[11px] font-mono text-muted-ice block mb-2">
-                SURFACE OBSERVATIONS
-              </span>
-              <div className="grid grid-cols-2 gap-1.5 text-[11px] font-mono">
-                {['SST', 'SSH', 'SSS', 'WINDS'].map((layer) => (
-                  <div key={layer} className="flex items-center gap-1 p-1 rounded bg-elevated/60 text-muted-ice border border-ocean/40">
-                    <Check className="w-3 h-3 text-brand" /> {layer}
+          {/* Bottom Results Panel */}
+          <div className="h-auto min-h-[300px] bg-midnight/90 backdrop-blur-md border border-ocean rounded-xl flex flex-col lg:flex-row shadow-xl overflow-hidden shrink-0">
+            <div className="flex-1 p-5 flex flex-col min-w-0">
+              {results ? (
+                <div className="flex-1 flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <h3 className="font-display font-bold text-lg text-ice uppercase tracking-wider">
+                        {viewMode === 'point' ? 'Vertical Thermal Profile' : '3D Volume Analysis'}
+                      </h3>
+                      <p className="text-xs text-brand font-mono mt-0.5">OCEANEMBED GENERATED PREDICTION</p>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                  
+                  <div className="flex-1 min-h-[250px] mt-2 flex flex-col">
+                     {viewMode === 'point' ? (
+                       <>
+                         <div className="flex justify-between items-end border-b border-ocean pb-3 mb-3 bg-elevated/30 rounded-lg p-3">
+                          <div className="space-y-1 text-center">
+                            <span className="text-ice font-bold text-lg">{results.temperature_c[0]}°C</span>
+                            <div className="text-muted-ice text-xs uppercase tracking-wider">Surface</div>
+                          </div>
+                          <div className="space-y-1 text-center">
+                            <span className="text-seafoam font-bold text-lg">{results.temperature_c[7]}°C</span>
+                            <div className="text-muted-ice text-xs uppercase tracking-wider">Thermocline</div>
+                          </div>
+                          <div className="space-y-1 text-center">
+                            <span className="text-warning font-bold text-lg">{results.temperature_c[12]}°C</span>
+                            <div className="text-muted-ice text-xs uppercase tracking-wider">Mesopelagic</div>
+                          </div>
+                        </div>
+                        <div className="flex-1 bg-deep/50 rounded-lg p-2 border border-ocean/50">
+                          <SubsurfaceProfileChart data={results} />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex-1 -mt-2">
+                        <TransectChart lat={selectedLocation.lat} lon={selectedLocation.lon} />
+                      </div>
+                    )}
+                 </div>
+               </div>
+             ) : (
+               <div className="flex-1 my-2 border-2 border-dashed border-ocean rounded-xl flex items-center justify-center flex-col text-muted-ice text-sm font-mono bg-elevated/10 min-h-[250px]">
+                 <Crosshair className="w-8 h-8 mb-3 opacity-40 text-brand" />
+                 Select geographic coordinates and click "RUN RECONSTRUCTION"
+               </div>
+             )}
+           </div>
 
-          <button
-            onClick={() => dispatch(runReconstruction())}
-            disabled={isInferring}
-            className="w-full py-2.5 bg-brand hover:bg-brand/90 text-deep font-display font-semibold text-xs tracking-wide rounded-lg shadow-glow transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <Compass className="w-3.5 h-3.5" />
-            {isInferring ? 'INFERRING PROFILE...' : 'RUN RECONSTRUCTION'}
-          </button>
-        </div>
-      </div>
+           {/* Float Comparison Card */}
+           {results && viewMode === 'point' && (
+             <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-ocean bg-elevated/20 p-5 flex flex-col justify-between shrink-0">
+               <div>
+                 <span className="inline-block px-2 py-1 rounded bg-argo/10 text-[10px] font-mono uppercase text-argo font-bold tracking-wider mb-3">
+                   In-Situ Verification
+                 </span>
+                 <h4 className="text-sm font-display font-bold text-ice mt-1">
+                   {results.nearest_argo.float_id}
+                 </h4>
+                 <p className="text-xs text-muted-ice mt-1 flex justify-between border-b border-ocean pb-2">
+                   Match distance: <strong className="text-ice">{results.nearest_argo.distance_km} km</strong>
+                 </p>
+               </div>
+
+               <div className="space-y-2 font-mono text-xs my-4">
+                 <div className="p-2.5 rounded-lg bg-deep/80 border border-ocean/60 flex justify-between items-center shadow-inner">
+                   <span className="text-muted-ice">Mean Bias</span>
+                   <span className="text-warning font-bold">+{results.metrics.mean_bias}°C</span>
+                 </div>
+                 <div className="p-2.5 rounded-lg bg-deep/80 border border-ocean/60 flex justify-between items-center shadow-inner">
+                   <span className="text-muted-ice">RMSE</span>
+                   <span className="text-seafoam font-bold">{results.metrics.rmse}</span>
+                 </div>
+                 <div className="p-2.5 rounded-lg bg-brand/10 border border-brand/30 flex justify-between items-center shadow-glow">
+                   <span className="text-brand">Confidence</span>
+                   <span className="text-brand font-bold text-sm">94.2%</span>
+                 </div>
+               </div>
+
+               <button className="w-full py-2.5 bg-midnight hover:bg-elevated text-xs font-mono text-seafoam border border-brand/40 rounded-lg flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
+                 Export LAS Matchup <ArrowUpRight className="w-4 h-4" />
+               </button>
+             </div>
+           )}
+         </div>
+       </div>
+
+       {/* Right Query Panel */}
+       <div className="w-full lg:w-80 border border-ocean bg-midnight/90 rounded-xl p-5 flex flex-col justify-between z-20 shadow-xl shrink-0">
+         <div className="space-y-6">
+           <div>
+             <span className="text-xs font-mono text-brand uppercase tracking-wider font-semibold">Analysis Mode</span>
+             <div className="flex bg-deep rounded-xl p-1.5 mt-3 border border-ocean shadow-inner">
+               <button 
+                 onClick={() => setViewMode('point')}
+                 className={`flex-1 py-2 text-xs font-mono rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${viewMode === 'point' ? 'bg-elevated text-ice shadow border border-brand/30' : 'text-muted-ice hover:text-ice'}`}
+               >
+                 <Crosshair className="w-4 h-4" /> 1D Profile
+               </button>
+               <button 
+                 onClick={() => setViewMode('transect')}
+                 className={`flex-1 py-2 text-xs font-mono rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer ${viewMode === 'transect' ? 'bg-elevated text-ice shadow border border-brand/30' : 'text-muted-ice hover:text-ice'}`}
+               >
+                 <Activity className="w-4 h-4" /> 3D Volume
+               </button>
+             </div>
+           </div>
+
+           <div className="bg-elevated/20 p-4 rounded-xl border border-ocean/50">
+             <h3 className="font-display font-medium text-ice text-sm mb-4">Query Parameters</h3>
+             <div className="space-y-4 font-mono text-xs">
+               <div>
+                 <label className="text-muted-ice block mb-1.5">LATITUDE (°N)</label>
+                 <input
+                   type="number"
+                   value={selectedLocation.lat.toFixed(4)}
+                   onChange={(e) =>
+                     dispatch(setLocation({ ...selectedLocation, lat: parseFloat(e.target.value) || 0 }))
+                   }
+                   className="w-full bg-deep border border-ocean rounded-lg px-3 py-2 text-ice focus:border-brand outline-none transition-colors"
+                 />
+               </div>
+
+               <div>
+                 <label className="text-muted-ice block mb-1.5">LONGITUDE (°E)</label>
+                 <input
+                   type="number"
+                   value={selectedLocation.lon.toFixed(4)}
+                   onChange={(e) =>
+                     dispatch(setLocation({ ...selectedLocation, lon: parseFloat(e.target.value) || 0 }))
+                   }
+                   className="w-full bg-deep border border-ocean rounded-lg px-3 py-2 text-ice focus:border-brand outline-none transition-colors"
+                 />
+               </div>
+
+               <div>
+                 <label className="text-muted-ice block mb-1.5 flex items-center gap-1.5">
+                   <Calendar className="w-3.5 h-3.5" /> TARGET DATE
+                 </label>
+                 <input
+                   type="date"
+                   value={selectedDate}
+                   onChange={(e) => dispatch(setDate(e.target.value))}
+                   className="w-full bg-deep border border-ocean rounded-lg px-3 py-2 text-ice focus:border-brand outline-none transition-colors"
+                 />
+               </div>
+             </div>
+           </div>
+
+           <div>
+             <span className="text-[11px] font-mono text-muted-ice block mb-2.5">
+               SURFACE SATELLITE INPUTS
+             </span>
+             <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+               {['SST (NOAA)', 'SSH (Jason-3)', 'SSS (SMAP)', 'Winds (ASCAT)'].map((layer) => (
+                 <div key={layer} className="flex items-center gap-1.5 p-1.5 rounded bg-brand/5 text-ice border border-brand/20">
+                   <Check className="w-3.5 h-3.5 text-brand" /> {layer}
+                 </div>
+               ))}
+             </div>
+           </div>
+         </div>
+
+         <button
+           onClick={() => dispatch(runReconstruction())}
+           disabled={isInferring}
+           className="w-full mt-6 py-3.5 bg-brand hover:bg-brand/90 text-deep font-display font-bold text-sm tracking-wide rounded-xl shadow-glow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:shadow-none"
+         >
+           {isInferring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Compass className="w-4 h-4" />}
+           {isInferring ? 'INFERRING...' : 'RUN RECONSTRUCTION'}
+         </button>
+       </div>
+     </div>
     </div>
   );
 };

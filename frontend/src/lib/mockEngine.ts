@@ -1,11 +1,13 @@
-import { STANDARD_DEPTHS, type ReconstructionResponse } from '../types/ocean';
+﻿import { STANDARD_DEPTHS, type ReconstructionResponse } from '../types/ocean';
 
 export const simulateInference = async (
   lat: number,
   lon: number,
-  _date: string
+  date: string
 ): Promise<ReconstructionResponse> => {
   await new Promise((r) => setTimeout(r, 2200));
+  console.log('Simulating for date:', date);
+  console.log('Simulating for date:', date);
 
   const sstBase = 28.5 + Math.sin(lat * 0.1) * 1.2 - Math.cos(lon * 0.05) * 0.8;
   const thermoclineDepth = 110 + Math.sin(lon * 0.2) * 35;
@@ -42,3 +44,4 @@ export const simulateInference = async (
     },
   };
 };
+

@@ -53,48 +53,61 @@ export const LandingPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-12 w-full flex-1 flex flex-col justify-center relative z-10">
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-midnight/90 border border-ocean text-seafoam font-mono text-xs mb-6 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-brand" />
-            <span>SATELLITE INTELLIGENCE FOR A DEEPER TOMORROW</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Earth Image */}
+          <div className="flex justify-center items-center relative animate-pulse-slow">
+             <div className="absolute inset-0 bg-brand/20 blur-[100px] rounded-full"></div>
+             <img 
+               src="https://upload.wikimedia.org/wikipedia/commons/2/23/Blue_Marble_2002.png" 
+               alt="Earth" 
+               className="w-full max-w-[400px] md:max-w-[500px] object-contain drop-shadow-[0_0_40px_rgba(15,175,154,0.5)] rounded-full border border-ocean/30"
+             />
           </div>
 
-          <h1
-            ref={headlineRef}
-            className="font-display font-bold text-5xl md:text-7xl tracking-tight text-ice leading-[1.05] uppercase"
-          >
-            SEE BELOW <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-seafoam via-brand to-satellite">
-              THE SURFACE.
-            </span>
-          </h1>
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-midnight/90 border border-ocean text-seafoam font-mono text-xs mb-6 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-brand" />
+              <span>SATELLITE INTELLIGENCE FOR A DEEPER TOMORROW</span>
+            </div>
 
-          <p
-            ref={subheadRef}
-            className="mt-6 text-muted-ice text-base md:text-lg max-w-2xl font-sans leading-relaxed"
-          >
-            OceanEmbed leverages multi-source surface satellite observations (SST, SSH, SSS,
-            Winds) and deep representation learning to reconstruct 3D subsurface ocean temperature
-            profiles down to 1000m depth across the North Indian Ocean.
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <button
-              onClick={() => dispatch(setView('explorer'))}
-              className="flex items-center gap-2.5 px-6 py-3.5 rounded-lg bg-brand hover:bg-brand/90 text-deep font-display font-semibold text-sm tracking-wide shadow-glow transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
+            <h1
+              ref={headlineRef}
+              className="font-display font-bold text-5xl md:text-7xl tracking-tight text-ice leading-[1.05] uppercase"
             >
-              <Compass className="w-4 h-4" />
-              <span>Explore the Ocean</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              SEE BELOW <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-seafoam via-brand to-satellite">
+                THE SURFACE.
+              </span>
+            </h1>
 
-            <button
-              onClick={() => dispatch(setView('about'))}
-              className="flex items-center gap-2 px-5 py-3.5 rounded-lg bg-midnight/90 hover:bg-elevated text-ice font-mono text-xs border border-ocean hover:border-ocean-bright transition-all cursor-pointer"
+            <p
+              ref={subheadRef}
+              className="mt-6 text-muted-ice text-base md:text-lg max-w-2xl font-sans leading-relaxed"
             >
-              <span>Methodology & Architecture</span>
-              <ExternalLink className="w-3.5 h-3.5 text-muted-ice" />
-            </button>
+              OceanEmbed leverages multi-source surface satellite observations (SST, SSH, SSS,
+              Winds) and deep representation learning to reconstruct 3D subsurface ocean temperature
+              profiles down to 1000m depth across the North Indian Ocean.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <button
+                onClick={() => dispatch(setView('explorer'))}
+                className="flex items-center gap-2.5 px-6 py-3.5 rounded-lg bg-brand hover:bg-brand/90 text-deep font-display font-semibold text-sm tracking-wide shadow-glow transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
+              >
+                <Compass className="w-4 h-4" />
+                <span>Explore the Ocean</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => dispatch(setView('about'))}
+                className="flex items-center gap-2 px-5 py-3.5 rounded-lg bg-midnight/90 hover:bg-elevated text-ice font-mono text-xs border border-ocean hover:border-ocean-bright transition-all cursor-pointer"
+              >
+                <span>Methodology & Architecture</span>
+                <ExternalLink className="w-3.5 h-3.5 text-muted-ice" />
+              </button>
+            </div>
           </div>
         </div>
 

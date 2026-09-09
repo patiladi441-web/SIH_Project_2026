@@ -1,11 +1,11 @@
-import React from 'react';
+﻿import React from 'react';
 import { Database, Search, DownloadCloud, ArrowUpRight, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 const DATASETS = [
   {
     name: 'Sea Surface Temperature (SST)',
     source: 'NOAA OISST / CMEMS',
-    spatial: '0.25°',
+    spatial: '0.25Â°',
     temporal: 'Daily',
     coverage: '1981 - 2026',
     status: 'Available',
@@ -14,7 +14,7 @@ const DATASETS = [
   {
     name: 'Sea Surface Height (SSH / SLA)',
     source: 'ISRO / CMEMS (Jason-3)',
-    spatial: '0.25°',
+    spatial: '0.25Â°',
     temporal: 'Daily',
     coverage: '1993 - 2026',
     status: 'Available',
@@ -23,7 +23,7 @@ const DATASETS = [
   {
     name: 'Sea Surface Salinity (SSS)',
     source: 'SMAP / CMEMS',
-    spatial: '0.25°',
+    spatial: '0.25Â°',
     temporal: 'Daily',
     coverage: '2015 - 2026',
     status: 'Available',
@@ -32,7 +32,7 @@ const DATASETS = [
   {
     name: 'Surface Winds (U, V)',
     source: 'Oceansat-3 / ASCAT',
-    spatial: '0.25°',
+    spatial: '0.25Â°',
     temporal: 'Daily',
     coverage: '2000 - 2026',
     status: 'Available',
@@ -41,7 +41,7 @@ const DATASETS = [
   {
     name: 'Subsurface Temperature (Target)',
     source: 'GLORYS12V1 Reanalysis',
-    spatial: '0.25°',
+    spatial: '0.25Â°',
     temporal: 'Daily',
     coverage: '1993 - 2026',
     status: 'Available',
@@ -73,7 +73,7 @@ export const DataHub: React.FC = () => {
             <h1 className="text-3xl font-display font-bold text-ice">Satellite & Ocean Datasets</h1>
             <p className="text-muted-ice mt-2 max-w-2xl text-sm">
               Standardized, harmonized, and regridded inputs for the OceanEmbed representation learning pipeline. 
-              All data is spatially interpolated to a common 0.25° × 0.25° grid covering the North Indian Ocean.
+              All data is spatially interpolated to a common 0.25Â° Ã— 0.25Â° grid covering the North Indian Ocean.
             </p>
           </div>
           
