@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
     # ── Redis ─────────────────────────────────────────────────────────────────
     redis_url: str = "redis://localhost:6379/0"
-    cache_ttl_seconds: int = 3600
+    cache_ttl_seconds: int = 86400  # 24 hours (86400 seconds)
 
     # ── AI Engine ─────────────────────────────────────────────────────────────
     # When "mock", ai_client.py generates synthetic data.
@@ -43,10 +43,11 @@ class Settings(BaseSettings):
     # ── Grid / depth config ───────────────────────────────────────────────────
     grid_resolution: float = 0.25  # degrees
 
-    # Accepts both formats:
-    #   comma-separated:  DEPTH_LEVELS=0,10,20,50,100
-    #   JSON array:       DEPTH_LEVELS=[0,10,20,50,100]
-    depth_levels: List[int] = [0, 10, 20, 50, 100, 200, 500, 1000, 1500, 2000]
+    # Depth levels MUST match frontend STANDARD_DEPTHS in frontend/src/types/ocean.ts
+    # Frontend accesses temperature_c[7] (thermocline) and temperature_c[12] (mesopelagic)
+    # — any fewer than 13 items causes a silent `undefined°C` bug.
+    # Override via env: DEPTH_LEVELS=0,5,10,20,30,50,75,100,125,150,200,300,500,700,1000
+    depth_levels: List[int] = [0, 5, 10, 20, 30, 50, 75, 100, 125, 150, 200, 300, 500, 700, 1000]
 
     @field_validator("depth_levels", mode="before")
     @classmethod

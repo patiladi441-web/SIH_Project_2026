@@ -15,12 +15,15 @@ export interface ReconstructionResponse {
   depths_m: number[];
   temperature_c: number[];
   confidence: number[];
-  nearest_argo: ArgoProfile;
-  metrics: {
+  nearest_argo: ArgoProfile | null;
+  /** Validation metrics returned by the ML model — rmse, correlation, mean_bias */
+  metrics?: {
     rmse: number;
     correlation: number;
     mean_bias: number;
   };
+  cache_hit?: boolean;
+  is_mock?: boolean;
 }
 
 export const STANDARD_DEPTHS = [

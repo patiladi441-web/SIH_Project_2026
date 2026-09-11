@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import type { ReconstructionResponse } from '../types/ocean';
-import { simulateInference } from '../lib/mockEngine';
+import { reconstructProfile } from '../services/api';
 
 export type ActiveView = 'landing' | 'explorer' | 'data' | 'about';
 
@@ -11,39 +11,46 @@ interface ExplorerState {
   isInferring: boolean;
   inferenceStep: number;
   results: ReconstructionResponse | null;
+  error: string | null;
 }
 
 const initialState: ExplorerState = {
   currentView: 'landing',
   selectedLocation: { lat: 18.4521, lon: 72.8314, name: 'Arabian Sea (Central)' },
-  selectedDate: '2026-08-14',
+  selectedDate: '2024-08-14',
   isInferring: false,
   inferenceStep: 0,
   results: null,
+  error: null,
 };
 
 export const runReconstruction = createAsyncThunk(
   'explorer/runReconstruction',
-  async (_, { getState, dispatch }) => {
-    const state = (getState() as { explorer: ExplorerState }).explorer;
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const state = (getState() as { explorer: ExplorerState }).explorer;
 
-    dispatch(setInferenceStep(1));
-    await new Promise((r) => setTimeout(r, 600));
+      dispatch(setInferenceStep(1));
+      await new Promise((r) => setTimeout(r, 400));
 
-    dispatch(setInferenceStep(2));
-    await new Promise((r) => setTimeout(r, 700));
+      dispatch(setInferenceStep(2));
+      const response = await reconstructProfile({
+        latitude: state.selectedLocation.lat,
+        longitude: state.selectedLocation.lon,
+        date: state.selectedDate,
+      });
 
-    dispatch(setInferenceStep(3));
-    const response = await simulateInference(
-      state.selectedLocation.lat,
-      state.selectedLocation.lon,
-      state.selectedDate
-    );
+      dispatch(setInferenceStep(3));
+      await new Promise((r) => setTimeout(r, 300));
 
-    dispatch(setInferenceStep(4));
-    await new Promise((r) => setTimeout(r, 500));
+      dispatch(setInferenceStep(4));
+      await new Promise((r) => setTimeout(r, 200));
 
-    return response;
+      return response;
+    } catch (err: any) {
+      console.error('Reconstruction failed:', err);
+      return rejectWithValue(err.message || 'Failed to reconstruct profile');
+    }
   }
 );
 
@@ -72,13 +79,16 @@ export const explorerSlice = createSlice({
     builder
       .addCase(runReconstruction.pending, (state) => {
         state.isInferring = true;
+        state.error = null;
       })
       .addCase(runReconstruction.fulfilled, (state, action) => {
         state.isInferring = false;
         state.results = action.payload;
+        state.error = null;
       })
-      .addCase(runReconstruction.rejected, (state) => {
+      .addCase(runReconstruction.rejected, (state, action) => {
         state.isInferring = false;
+        state.error = (action.payload as string) || action.error.message || 'Error running reconstruction';
       });
   },
 });

@@ -72,14 +72,14 @@
   background-size: 100% 100%, 32px 32px, 32px 32px;
 }
 
-/* Leaflet Dark Theme Overrides */
+/* Leaflet Theme Overrides - Vibrant, crisp oceanic contrast */
 .leaflet-container {
-  background-color: #020817 !important;
+  background-color: #04121a !important;
   font-family: var(--font-mono) !important;
 }
 
 .leaflet-tile {
-  filter: brightness(0.65) invert(1) contrast(3) hue-rotate(180deg) saturate(0.35);
+  filter: contrast(1.06) saturate(1.1);
 }
 
 /* Modern Minimal Dark Scrollbar */

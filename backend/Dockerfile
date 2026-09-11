@@ -6,12 +6,15 @@ WORKDIR /build
 # Install build dependencies (needed for some compiled wheels)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    g++ \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
+    pip wheel --no-cache-dir --wheel-dir /wheels \
+    --extra-index-url https://download.pytorch.org/whl/cpu \
+    -r requirements.txt
 
 
 # ─── Stage 2: runtime ─────────────────────────────────────────────────────────
@@ -33,13 +36,13 @@ WORKDIR /app
 
 # Install wheels from builder
 COPY --from=builder /wheels /wheels
-RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
+RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu /wheels/* && rm -rf /wheels
 
 # Copy application source
 COPY . .
 
-# Create data directory for NetCDF files
-RUN mkdir -p /app/data/raw && chown -R oceanembed:oceanembed /app
+# Create data directory for NetCDF files and AI model storage
+RUN mkdir -p /app/data/raw /app/AI-model && chown -R oceanembed:oceanembed /app
 
 USER oceanembed
 

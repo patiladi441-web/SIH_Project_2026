@@ -119,8 +119,8 @@ export const LandingPage: React.FC = () => {
               <Layers className="w-4 h-4 text-satellite" />
               <span>INPUT DATASETS</span>
             </div>
-            <div className="text-2xl font-display font-bold text-ice">4+ Sources</div>
-            <div className="text-[11px] font-mono text-muted-ice/70 mt-1">SST • SSH • SSS • ASCAT</div>
+            <div className="text-2xl font-display font-bold text-ice"> 7 Sources</div>
+            <div className="text-[11px] font-mono text-muted-ice/70 mt-1">SST • SSH • SSS • WIND • CURRENTS </div>
           </div>
 
           <div className="p-5 rounded-2xl bg-midnight/80 border border-ocean backdrop-blur-md shadow-lg transition-transform hover:-translate-y-1">
@@ -129,7 +129,7 @@ export const LandingPage: React.FC = () => {
               <span>VERTICAL REACH</span>
             </div>
             <div className="text-2xl font-display font-bold text-brand-light">0 - 1000 m</div>
-            <div className="text-[11px] font-mono text-muted-ice/70 mt-1">15 standard levels</div>
+            <div className="text-[11px] font-mono text-muted-ice/70 mt-1">12 standard levels</div>
           </div>
 
           <div className="p-5 rounded-2xl bg-midnight/80 border border-ocean backdrop-blur-md shadow-lg transition-transform hover:-translate-y-1">

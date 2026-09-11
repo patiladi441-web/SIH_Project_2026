@@ -5,7 +5,7 @@ Pydantic schemas for the /reconstruct endpoint.
 
 CONTRACT (frozen — matches roadmap Section 6.1):
   Request:  { latitude, longitude, date }
-  Response: { depths_m, temperature_c, confidence?, nearest_argo? }
+  Response: { depths_m, temperature_c, confidence?, nearest_argo?, metrics? }
 
 Do NOT change the field names here without coordinating with the frontend
 and the AI team (ai_client.py output shape must match this schema).
@@ -42,6 +42,24 @@ class ReconstructRequest(BaseModel):
     )
 
 
+class InSituMetrics(BaseModel):
+    """
+    Validation metrics returned by the AI model comparing its prediction
+    against the nearest in-situ Argo float profile.
+    Field names match exactly what the ML model microservice returns.
+    """
+
+    rmse: float = Field(
+        ..., description="Root Mean Square Error between AI prediction and Argo in-situ (°C)"
+    )
+    correlation: float = Field(
+        ..., description="Pearson correlation coefficient between AI and Argo temperatures"
+    )
+    mean_bias: float = Field(
+        ..., description="Mean bias (AI - Argo) in °C — positive means AI predicts warmer"
+    )
+
+
 class ReconstructResult(BaseModel):
     """
     Internal data class — returned by ai_client.predict_profile().
@@ -61,6 +79,11 @@ class ReconstructResult(BaseModel):
     nearest_argo: ArgoProfileResponse | None = Field(
         None,
         description="Nearest real Argo float profile for comparison",
+    )
+    metrics: InSituMetrics | None = Field(
+        None,
+        description="Validation metrics from the ML model (rmse, correlation, mean_bias). "
+                    "Populated by the real AI model response; None in mock mode.",
     )
     cache_hit: bool = Field(
         False,

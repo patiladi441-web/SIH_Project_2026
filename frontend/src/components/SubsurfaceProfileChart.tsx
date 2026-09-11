@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React, { useMemo } from 'react';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -15,20 +15,22 @@ interface Props {
   data: ReconstructionResponse;
 }
 
-export const SubsurfaceProfileChart: React.FC<Props> = ({ data }) => {
-  const chartData = data.depths_m.map((depth, idx) => {
-    const ai = data.temperature_c[idx];
-    const conf = data.confidence[idx] || 0.9;
-    const margin = (1 - conf) * 4; 
+export const SubsurfaceProfileChart: React.FC<Props> = React.memo(({ data }) => {
+  const chartData = useMemo(() => {
+    return data.depths_m.map((depth, idx) => {
+      const ai = data.temperature_c[idx];
+      const conf = data.confidence[idx] || 0.9;
+      const margin = (1 - conf) * 4; 
 
-    return {
-      depth,
-      aiTemp: ai,
-      argoTemp: data.nearest_argo.temperature_c[idx],
-      confUpper: parseFloat((ai + margin).toFixed(2)),
-      confLower: parseFloat((ai - margin).toFixed(2)),
-    };
-  });
+      return {
+        depth,
+        aiTemp: ai,
+        argoTemp: data.nearest_argo?.temperature_c?.[idx] ?? null,
+        confUpper: parseFloat((ai + margin).toFixed(2)),
+        confLower: parseFloat((ai - margin).toFixed(2)),
+      };
+    });
+  }, [data]);
 
   return (
     <div className="w-full h-full min-h-[200px] flex flex-col pt-2 font-mono text-xs">
@@ -96,4 +98,5 @@ export const SubsurfaceProfileChart: React.FC<Props> = ({ data }) => {
       </div>
     </div>
   );
-};
+});
+

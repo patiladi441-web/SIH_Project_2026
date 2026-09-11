@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../app/store';
 import { runReconstruction, setLocation, setDate } from '../features/explorerSlice';
 import { OceanMap } from '../components/OceanMap';
 import { SubsurfaceProfileChart } from '../components/SubsurfaceProfileChart';
 import { TransectChart } from '../components/TransectChart';
+import { QueryHistory } from '../components/QueryHistory';
 import {
   Compass,
   Layers,
@@ -16,7 +17,9 @@ import {
   Loader2,
   CheckCircle2,
   Activity,
+  AlertCircle,
 } from 'lucide-react';
+import { validateOceanCoordinate } from '../utils/oceanMask';
 
 const STEPS = [
   'Querying multi-spectral surface fields (SST, SSS, SSH, Wind)',
@@ -28,9 +31,48 @@ const STEPS = [
 export const Explorer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [viewMode, setViewMode] = useState<'point' | 'transect'>('point');
+  const [queryRefreshCount, setQueryRefreshCount] = useState(0);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
-  const { selectedLocation, selectedDate, isInferring, inferenceStep, results } =
+  const { selectedLocation, selectedDate, isInferring, inferenceStep, results, error } =
     useSelector((state: RootState) => state.explorer);
+
+  // Local input state — keeps UI in sync with map clicks while allowing free typing
+  const [latInput, setLatInput] = useState(selectedLocation.lat.toFixed(4));
+  const [lonInput, setLonInput] = useState(selectedLocation.lon.toFixed(4));
+
+  // Sync inputs whenever user clicks a new point on the map
+  useEffect(() => {
+    setLatInput(selectedLocation.lat.toFixed(4));
+    setLonInput(selectedLocation.lon.toFixed(4));
+  }, [selectedLocation.lat, selectedLocation.lon]);
+
+  // Auto-scroll to results panel and refresh query logs when results arrive
+  useEffect(() => {
+    if (results) {
+      setQueryRefreshCount(c => c + 1);
+      if (resultsRef.current) {
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+      }
+    }
+  }, [results]);
+
+  const parsedLat = parseFloat(latInput);
+  const parsedLon = parseFloat(lonInput);
+  const oceanValidation = validateOceanCoordinate(
+    !isNaN(parsedLat) ? parsedLat : selectedLocation.lat,
+    !isNaN(parsedLon) ? parsedLon : selectedLocation.lon
+  );
+
+  const handleRunReconstruction = () => {
+    if (!oceanValidation.isOcean) return;
+    if (!isNaN(parsedLat) && !isNaN(parsedLon)) {
+      dispatch(setLocation({ ...selectedLocation, lat: parsedLat, lon: parsedLon, name: oceanValidation.regionName }));
+    }
+    dispatch(runReconstruction());
+  };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col w-full bg-deep">
@@ -65,7 +107,7 @@ export const Explorer: React.FC = () => {
         <div className="flex-1 flex flex-col gap-6 rounded-xl min-w-0 animate-slide-up" style={{ animationDelay: '0.1s' }}>
           
           {/* Map Viewport Area */}
-          <div className="relative bg-[#04121A] rounded-xl overflow-hidden border border-ocean shadow-xl min-h-[350px] lg:flex-1 shrink-0">
+          <div className="relative bg-[#04121A] rounded-xl overflow-hidden border border-ocean shadow-xl min-h-[520px] h-[520px] lg:h-[560px] shrink-0">
             <div className="absolute inset-0 bg-[radial-gradient(#0FAF9A_1px,transparent_1px)] [background-size:28px_28px] opacity-15 pointer-events-none z-10" />
             
             {/* Overlay UI */}
@@ -79,8 +121,12 @@ export const Explorer: React.FC = () => {
               </div>
             </div>
 
-            <div className="absolute inset-0 z-0">
-              <OceanMap lat={selectedLocation.lat} lon={selectedLocation.lon} onLocationSelect={(lat, lon) => dispatch(setLocation({ lat, lon }))} />
+            <div className="absolute inset-0 z-0 isolate">
+              <OceanMap
+                lat={selectedLocation.lat}
+                lon={selectedLocation.lon}
+                onLocationSelect={(lat, lon, name) => dispatch(setLocation({ lat, lon, name }))}
+              />
             </div>
             
             {/* Inference Loader Overlay */}
@@ -110,7 +156,7 @@ export const Explorer: React.FC = () => {
           </div>
 
           {/* Bottom Results Panel */}
-          <div className="h-auto min-h-[300px] bg-midnight/90 backdrop-blur-md border border-ocean rounded-xl flex flex-col lg:flex-row shadow-xl overflow-hidden shrink-0">
+          <div ref={resultsRef} className="h-auto min-h-[300px] bg-midnight/90 border border-ocean rounded-xl flex flex-col lg:flex-row shadow-xl overflow-hidden shrink-0">
             <div className="flex-1 p-5 flex flex-col min-w-0">
               {results ? (
                 <div className="flex-1 flex flex-col justify-between">
@@ -146,17 +192,29 @@ export const Explorer: React.FC = () => {
                       </>
                     ) : (
                       <div className="flex-1 -mt-2">
-                        <TransectChart lat={selectedLocation.lat} lon={selectedLocation.lon} />
+                        <TransectChart lat={selectedLocation.lat} lon={selectedLocation.lon} data={results} />
                       </div>
                     )}
                  </div>
                </div>
-             ) : (
-               <div className="flex-1 my-2 border-2 border-dashed border-ocean rounded-xl flex items-center justify-center flex-col text-muted-ice text-sm font-mono bg-elevated/10 min-h-[250px]">
-                 <Crosshair className="w-8 h-8 mb-3 opacity-40 text-brand" />
-                 Select geographic coordinates and click "RUN RECONSTRUCTION"
-               </div>
-             )}
+              ) : (
+                <div className="flex-1 my-2 border-2 border-dashed border-ocean rounded-xl flex items-center justify-center flex-col text-muted-ice text-sm font-mono bg-elevated/10 min-h-[250px] p-6 text-center">
+                  {error ? (
+                    <div className="max-w-md p-4 bg-red-950/40 border border-red-500/30 rounded-lg text-red-200 text-xs">
+                      <p className="font-bold text-red-400 mb-1 uppercase tracking-wider">Inference Error</p>
+                      <p className="leading-relaxed">{error}</p>
+                      <p className="mt-2 text-[10px] text-muted-ice">
+                        Make sure the backend is running on <code className="text-ice">http://localhost:8000</code>.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <Crosshair className="w-8 h-8 mb-3 opacity-40 text-brand" />
+                      Select geographic coordinates and click "RUN RECONSTRUCTION"
+                    </>
+                  )}
+                </div>
+              )}
            </div>
 
            {/* Float Comparison Card */}
@@ -167,25 +225,33 @@ export const Explorer: React.FC = () => {
                    In-Situ Verification
                  </span>
                  <h4 className="text-sm font-display font-bold text-ice mt-1">
-                   {results.nearest_argo.float_id}
+                   {results.nearest_argo?.float_id ?? 'N/A'}
                  </h4>
                  <p className="text-xs text-muted-ice mt-1 flex justify-between border-b border-ocean pb-2">
-                   Match distance: <strong className="text-ice">{results.nearest_argo.distance_km} km</strong>
+                   Match distance: <strong className="text-ice">{results.nearest_argo?.distance_km ?? '—'} km</strong>
                  </p>
                </div>
 
                <div className="space-y-2 font-mono text-xs my-4">
                  <div className="p-2.5 rounded-lg bg-deep/80 border border-ocean/60 flex justify-between items-center shadow-inner">
                    <span className="text-muted-ice">Mean Bias</span>
-                   <span className="text-warning font-bold">+{results.metrics.mean_bias}°C</span>
+                   <span className="text-warning font-bold">
+                     {results.metrics?.mean_bias != null
+                       ? `${results.metrics.mean_bias > 0 ? '+' : ''}${results.metrics.mean_bias}°C`
+                       : '—'}
+                   </span>
                  </div>
                  <div className="p-2.5 rounded-lg bg-deep/80 border border-ocean/60 flex justify-between items-center shadow-inner">
                    <span className="text-muted-ice">RMSE</span>
-                   <span className="text-seafoam font-bold">{results.metrics.rmse}</span>
+                   <span className="text-seafoam font-bold">
+                     {results.metrics?.rmse != null ? `${results.metrics.rmse}°C` : '—'}
+                   </span>
                  </div>
                  <div className="p-2.5 rounded-lg bg-brand/10 border border-brand/30 flex justify-between items-center shadow-glow">
-                   <span className="text-brand">Confidence</span>
-                   <span className="text-brand font-bold text-sm">94.2%</span>
+                   <span className="text-brand">Correlation (R)</span>
+                   <span className="text-brand font-bold text-sm">
+                     {results.metrics?.correlation != null ? results.metrics.correlation.toFixed(4) : '—'}
+                   </span>
                  </div>
                </div>
 
@@ -225,10 +291,12 @@ export const Explorer: React.FC = () => {
                  <label className="text-muted-ice block mb-1.5">LATITUDE (°N)</label>
                  <input
                    type="number"
-                   value={selectedLocation.lat.toFixed(4)}
-                   onChange={(e) =>
-                     dispatch(setLocation({ ...selectedLocation, lat: parseFloat(e.target.value) || 0 }))
-                   }
+                   value={latInput}
+                   onChange={(e) => setLatInput(e.target.value)}
+                   onBlur={(e) => {
+                     const val = parseFloat(e.target.value);
+                     if (!isNaN(val)) dispatch(setLocation({ ...selectedLocation, lat: val }));
+                   }}
                    className="w-full bg-deep border border-ocean rounded-lg px-3 py-2 text-ice focus:border-brand outline-none transition-colors"
                  />
                </div>
@@ -237,10 +305,12 @@ export const Explorer: React.FC = () => {
                  <label className="text-muted-ice block mb-1.5">LONGITUDE (°E)</label>
                  <input
                    type="number"
-                   value={selectedLocation.lon.toFixed(4)}
-                   onChange={(e) =>
-                     dispatch(setLocation({ ...selectedLocation, lon: parseFloat(e.target.value) || 0 }))
-                   }
+                   value={lonInput}
+                   onChange={(e) => setLonInput(e.target.value)}
+                   onBlur={(e) => {
+                     const val = parseFloat(e.target.value);
+                     if (!isNaN(val)) dispatch(setLocation({ ...selectedLocation, lon: val }));
+                   }}
                    className="w-full bg-deep border border-ocean rounded-lg px-3 py-2 text-ice focus:border-brand outline-none transition-colors"
                  />
                </div>
@@ -256,6 +326,22 @@ export const Explorer: React.FC = () => {
                    className="w-full bg-deep border border-ocean rounded-lg px-3 py-2 text-ice focus:border-brand outline-none transition-colors"
                  />
                </div>
+
+               {/* Ocean vs Land Status Badge */}
+               {!oceanValidation.isOcean ? (
+                 <div className="p-2.5 rounded-lg bg-red-950/60 border border-red-500/50 text-[11px] font-mono text-red-200 flex items-start gap-2">
+                   <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                   <div>
+                     <span className="font-bold text-red-300 block">Landmass Detected</span>
+                     <span>{oceanValidation.regionName}. OceanEmbed only processes marine coordinates.</span>
+                   </div>
+                 </div>
+               ) : (
+                 <div className="px-3 py-1.5 rounded-lg bg-brand/10 border border-brand/30 text-[11px] font-mono text-brand flex items-center justify-between">
+                   <span className="text-muted-ice">Target Basin:</span>
+                   <span className="font-bold">{oceanValidation.regionName}</span>
+                 </div>
+               )}
              </div>
            </div>
 
@@ -274,15 +360,30 @@ export const Explorer: React.FC = () => {
          </div>
 
          <button
-           onClick={() => dispatch(runReconstruction())}
-           disabled={isInferring}
-           className="w-full mt-6 py-3.5 bg-brand hover:bg-brand/90 text-deep font-display font-bold text-sm tracking-wide rounded-xl shadow-glow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:shadow-none"
+           onClick={handleRunReconstruction}
+           disabled={isInferring || !oceanValidation.isOcean}
+           className="w-full mt-6 py-3.5 bg-brand hover:bg-brand/90 text-deep font-display font-bold text-sm tracking-wide rounded-xl shadow-glow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
          >
-           {isInferring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Compass className="w-4 h-4" />}
-           {isInferring ? 'INFERRING...' : 'RUN RECONSTRUCTION'}
+           {isInferring ? (
+             <Loader2 className="w-4 h-4 animate-spin" />
+           ) : !oceanValidation.isOcean ? (
+             <AlertCircle className="w-4 h-4 text-deep" />
+           ) : (
+             <Compass className="w-4 h-4" />
+           )}
+           {isInferring
+             ? 'INFERRING...'
+             : !oceanValidation.isOcean
+             ? 'OCEAN COORDINATES REQUIRED'
+             : 'RUN RECONSTRUCTION'}
          </button>
        </div>
-     </div>
+      </div>
+
+      {/* ── Query History Panel (full-width below workbench) ── */}
+      <div className="px-6 pb-8 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        <QueryHistory refreshTrigger={queryRefreshCount} />
+      </div>
     </div>
   );
-};
+};

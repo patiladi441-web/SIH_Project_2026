@@ -1,36 +1,133 @@
-# Environments
+# ==============================================================================
+# Root .gitignore for SIH Project 2026 (Fullstack: FastAPI + React/Vite)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secrets
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+!.env.example
+!**/.env.example
+
+# ------------------------------------------------------------------------------
+# Python & Virtual Environments
+# ------------------------------------------------------------------------------
 .venv/
 venv/
 env/
 ENV/
+env.bak/
+venv.bak/
+.Python
+PYTHONHOME/
 
-# IDE and Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Environment variables
-.env
-.env.local
-
-# Python cache & artifacts
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-*.egg-info/
-dist/
+*.so
+
+# Distribution / packaging
 build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing, Linting & Type Checking
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
-# Data & Logs
-*.log
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# ------------------------------------------------------------------------------
+# Node / Frontend (React + Vite)
+# ------------------------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.turbo/
+.eslintcache
+*.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# Data, Databases & Local Storage
+# ------------------------------------------------------------------------------
 data/raw/
 data/processed/
+backend/data/raw/
+backend/data/processed/
 *.nc
+*.sqlite
+*.sqlite3
+*.db
+!AI-model/sih_satellite_transformer_full.pkl
 
-# OS files
+# ------------------------------------------------------------------------------
+# Logs & Debug Output
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# IDEs & Text Editors
+# ------------------------------------------------------------------------------
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sublime-project
+*.sublime-workspace
+
+# ------------------------------------------------------------------------------
+# Operating System Files
+# ------------------------------------------------------------------------------
 .DS_Store
+.DS_Store?
+._*
 Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ------------------------------------------------------------------------------
+# Plan & Documentation Notes
+# ------------------------------------------------------------------------------
+plan.md
+PROJECT_ARCHITECTURE.md
+FRONTEND_BACKEND_INTEGRATION_ANALYSIS.md
+BACKEND_PRESENTATION_GUIDE.md
+PRESENTATION_GUIDE.md
+*PRESENTATION_GUIDE.md

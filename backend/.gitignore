@@ -1,20 +1,74 @@
+# ==============================================================================
+# Backend .gitignore (FastAPI / Python)
+# ==============================================================================
+
+# Environment variables & secrets
 .env
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-dist/
-build/
+.env.*
+*.env
+!.env.example
+
+# Python virtual environments
 .venv/
 venv/
 env/
+ENV/
+env.bak/
+venv.bak/
+.Python
+
+# Bytecode & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Packaging & Builds
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Testing & Linting
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Data & Databases
 data/raw/
 data/processed/
 *.nc
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+logs/
 *.log
+
+# Editor & OS files
 .vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Documentation & presentation guides
+PRESENTATION_GUIDE.md
+BACKEND_PRESENTATION_GUIDE.md

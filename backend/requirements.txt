@@ -21,9 +21,14 @@ python-dotenv==1.0.1
 xarray==2024.6.0
 netCDF4==1.7.1
 h5netcdf==1.3.0
-numpy==1.26.4
-scipy==1.14.0
+numpy>=1.26.4
+scipy>=1.14.0
 shapely>=2.0.0
+
+# ── Machine Learning / Model Inference ─────────────────────────────────────────
+# CPU wheels downloaded using --extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2.0
+scikit-learn>=1.4.0
 
 # ── HTTP client (for AI engine calls) ─────────────────────────────────────────
 httpx==0.27.0

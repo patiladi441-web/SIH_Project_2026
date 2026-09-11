@@ -34,10 +34,17 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Startup and shutdown hooks."""
     logger.info(
-        "OceanEmbed API starting up | env=%s | mock_ai=%s",
+        "OceanEmbed API starting up | env=%s | engine=%s",
         settings.app_env,
-        settings.is_mock_ai,
+        settings.ai_engine_url,
     )
+    # Pre-warm AI model if available
+    try:
+        from app.services.transformer_model import engine as model_engine
+        model_engine.load()
+    except Exception as exc:
+        logger.warning("Could not pre-warm model on startup: %s", exc)
+
     yield
     logger.info("OceanEmbed API shutting down")
 

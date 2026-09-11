@@ -4,10 +4,10 @@ x-backend-env: &backend-env
   REDIS_URL: redis://redis:6379/0
   CELERY_BROKER_URL: redis://redis:6379/1
   CELERY_RESULT_BACKEND: redis://redis:6379/2
-  AI_ENGINE_URL: mock
+  AI_ENGINE_URL: model
   GRID_RESOLUTION: "0.25"
-  DEPTH_LEVELS: "[0,10,20,50,100,200,500,1000,1500,2000]"
-  CACHE_TTL_SECONDS: "3600"
+  DEPTH_LEVELS: "[0, 5, 10, 20, 30, 50, 75, 100, 125, 150, 200, 300, 500, 700, 1000]"
+  CACHE_TTL_SECONDS: "86400"  # 24 hours
   APP_ENV: development
   LOG_LEVEL: INFO
 
@@ -59,8 +59,9 @@ services:
     environment:
       <<: *backend-env
     volumes:
-      - ./data:/app/data        # persist downloaded NetCDF files
-      - .:/app                  # hot-reload in dev (remove in prod)
+      - ./data:/app/data                # persist downloaded NetCDF files
+      - ../AI-model:/app/AI-model:ro    # mount AI model weights & pkl
+      - .:/app                          # hot-reload in dev
     ports:
       - "8000:8000"
     depends_on:
@@ -93,6 +94,7 @@ services:
       <<: *backend-env
     volumes:
       - ./data:/app/data
+      - ../AI-model:/app/AI-model:ro    # mount AI model weights & pkl
       - .:/app
     depends_on:
       postgres:
