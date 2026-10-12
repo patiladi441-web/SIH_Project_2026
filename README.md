@@ -690,45 +690,6 @@ The backend's AI client is the intended integration boundary. The actual inferen
 
 ---
 
-## ⚠️ 16. Limitations
-
-- Subsurface temperature is estimated rather than directly observed at every location.
-- Prediction quality depends on the training dataset and geographical coverage.
-- Performance may degrade in regions or conditions not represented in training data.
-- Mock-mode responses are simulated and cannot be used as evidence of model accuracy.
-- The backend's example depth range and the notebook's target depths must be reconciled before production inference.
-- Confidence scores require a documented method and calibration before they can be interpreted probabilistically.
-- Operational scientific applications require independent validation and appropriate uncertainty reporting.
-
-OceanEmbed is a research and decision-support project, not a replacement for direct ocean measurements or validated operational forecasting systems.
-
-## 🤝 17. Contributing
-
-Contributions are welcome in model development, scientific data processing, backend engineering, frontend development, and evaluation.
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Implement a focused change.
-4. Add tests or evaluation evidence where appropriate.
-5. Document any changes to the model architecture or API.
-6. Submit a pull request.
-
-Example:
-
-```bash
-git checkout -b feature/improve-profile-reconstruction
-git add .
-git commit -m "Improve profile reconstruction"
-git push origin feature/improve-profile-reconstruction
-```
-
-Avoid committing credentials, private data, large datasets, or model artifacts that should be distributed separately.
-
-## 📄 18. License
-
-Refer to the repository's `LICENSE` file for the applicable license terms. Do not assume unrestricted reuse if the repository does not specify a license.
-
----
 
 ## 🌊 Final Summary
 
