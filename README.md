@@ -701,4 +701,4 @@ The project combines a model-training workflow with a backend designed for both 
 
 **The vision: See beyond the ocean surface. Reconstruct the ocean beneath.**
 
-**Repository:** [OceanEmbed — SIH Project 2026](https://github.com/VinayCodes17/SIH_Project_2026)
+**Repository:** [OceanEmbed — SIH Project 2026]([https://github.com/VinayCodes17/SIH_Project_2026](https://github.com/patiladi441-web/SIH_Project_2026))
